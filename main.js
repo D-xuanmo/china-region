@@ -2,11 +2,7 @@ const puppeteer = require('puppeteer')
 const fs = require('fs')
 const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
 
-const sleep = (wait) => new Promise((resolve) => {
-  setTimeout(resolve, wait)
-});
-
-(async () => {
+;(async () => {
   let provinceData = []
   let cityOriginalData = []
   let countyOriginalData = []
@@ -31,7 +27,7 @@ const sleep = (wait) => new Promise((resolve) => {
       const label = province.innerText.replace('\n', '')
       provinceData.push({
         label,
-        value: `${id}0000000`,
+        value: id,
         url,
         parentId: '0'
       })
@@ -42,7 +38,6 @@ const sleep = (wait) => new Promise((resolve) => {
   // 遍历城市数据
   for (let i = 0; i < provinceData.length; i++) {
     const item = provinceData[i]
-    await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     cityOriginalData = await page.evaluate(([cityOriginalData, item]) => {
@@ -53,7 +48,7 @@ const sleep = (wait) => new Promise((resolve) => {
         const label = city.innerText.replace('\n', '')
         cityOriginalData.push({
           label,
-          value: `${id}00000`,
+          value: id,
           url,
           parentId: item.value
         })
@@ -65,7 +60,6 @@ const sleep = (wait) => new Promise((resolve) => {
   // 遍历县级数据
   for (let i = 0; i < cityOriginalData.length; i++) {
     const item = cityOriginalData[i]
-    await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     countyOriginalData = await page.evaluate(([countyOriginalData, item]) => {
@@ -76,7 +70,7 @@ const sleep = (wait) => new Promise((resolve) => {
         const label = county.innerText.replace('\n', '')
         countyOriginalData.push({
           label,
-          value: `${id}000`,
+          value: id,
           url,
           parentId: item.value
         })
@@ -88,7 +82,6 @@ const sleep = (wait) => new Promise((resolve) => {
   // 遍历镇级数据
   for (let i = 0; i < countyOriginalData.length; i++) {
     const item = countyOriginalData[i]
-    await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     townOriginalData = await page.evaluate(([townOriginalData, item]) => {
@@ -115,16 +108,14 @@ const sleep = (wait) => new Promise((resolve) => {
     ...cityOriginalData,
     ...countyOriginalData,
     ...townOriginalData
-  ].map((item) => {
-    const { url, ...rest } = item
-    return rest
-  })
+  ]
   const region = generateTree(flatData, '0', 'parentId', 'value')
 
   // 清理多余的属性，减少数据体积
   const clear = (arr) => {
     return arr.map((item) => {
       delete item.parentId
+      delete item.url
       if (isEmpty(item.children)) delete item.children
       if (Array.isArray(item.children)) {
         item.children = clear(item.children)
