@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
-const { generateTree } = require('@xuanmo/javascript-utils')
+const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
 
 const sleep = (wait) => new Promise((resolve) => {
   setTimeout(resolve, wait)
@@ -25,6 +25,7 @@ const sleep = (wait) => new Promise((resolve) => {
   provinceData = await page.evaluate((provinceData) => {
     const provinceLinks = document.querySelector('.provincetable').querySelectorAll('a')
     for (let i = 0; i < provinceLinks.length; i++) {
+      if (i > 3) break
       const province = provinceLinks[i]
       const url = province.href
       const { id } = url.match(/(?<id>\d+)\.html$/).groups
@@ -41,8 +42,9 @@ const sleep = (wait) => new Promise((resolve) => {
 
   // 遍历城市数据
   for (let i = 0; i < provinceData.length; i++) {
+    if (i > 3) break
     const item = provinceData[i]
-    await sleep(2000)
+    // await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     cityOriginalData = await page.evaluate(([cityOriginalData, item]) => {
@@ -64,8 +66,9 @@ const sleep = (wait) => new Promise((resolve) => {
 
   // 遍历县级数据
   for (let i = 0; i < cityOriginalData.length; i++) {
+    if (i > 3) break
     const item = cityOriginalData[i]
-    await sleep(2000)
+    // await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     countyOriginalData = await page.evaluate(([countyOriginalData, item]) => {
@@ -87,8 +90,9 @@ const sleep = (wait) => new Promise((resolve) => {
 
   // 遍历镇级数据
   for (let i = 0; i < countyOriginalData.length; i++) {
+    if (i > 3) break
     const item = countyOriginalData[i]
-    await sleep(2000)
+    // await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     townOriginalData = await page.evaluate(([townOriginalData, item]) => {
@@ -119,12 +123,22 @@ const sleep = (wait) => new Promise((resolve) => {
     const { url, ...rest } = item
     return rest
   })
+  const region = generateTree(flatData, '0', 'parentId', 'value')
+
+  // 清理多余的属性，减少数据体积
+  const clear = (arr) => {
+    return arr.map((item) => {
+      delete item.parentId
+      if (isEmpty(item.children)) delete item.children
+      if (Array.isArray(item.children)) {
+        item.children = clear(item.children)
+      }
+      return item
+    })
+  }
+
   fs.writeFileSync(
     'region.json',
-    JSON.stringify(
-      generateTree(flatData, '0', 'parentId', 'value'),
-      undefined,
-      2
-    )
+    JSON.stringify(clear(region), undefined, 2)
   )
 })()
