@@ -13,7 +13,7 @@ const sleep = (wait) => new Promise((resolve) => {
   let townOriginalData = []
   const sourceURL = 'http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/index.html'
   const browser = await puppeteer.launch({
-    headless: false
+    headless: 'new'
   })
   const page = await browser.newPage()
 
