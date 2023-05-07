@@ -13,7 +13,7 @@ const sleep = (wait) => new Promise((resolve) => {
   let townOriginalData = []
   const sourceURL = 'http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/index.html'
   const browser = await puppeteer.launch({
-    headless: 'new'
+    headless: false
   })
   const page = await browser.newPage()
 
@@ -28,8 +28,9 @@ const sleep = (wait) => new Promise((resolve) => {
       const province = provinceLinks[i]
       const url = province.href
       const { id } = url.match(/(?<id>\d+)\.html$/).groups
+      const label = province.innerText.replace('\n', '')
       provinceData.push({
-        label: province.innerText.replace('\n', ''),
+        label,
         value: `${id}0000000`,
         url,
         parentId: '0'
@@ -41,15 +42,17 @@ const sleep = (wait) => new Promise((resolve) => {
   // 遍历城市数据
   for (let i = 0; i < provinceData.length; i++) {
     const item = provinceData[i]
-    await sleep(5000)
+    await sleep(2000)
     await page.goto(item.url)
+    console.log(item.label)
     cityOriginalData = await page.evaluate(([cityOriginalData, item]) => {
       const cityLinks = document.querySelectorAll('.citytable .citytr td:last-of-type a')
       cityLinks.forEach((city) => {
         const url = city.href
         const { id } = url.match(/(?<id>\d+)\.html$/).groups
+        const label = city.innerText.replace('\n', '')
         cityOriginalData.push({
-          label: city.innerText.replace('\n', ''),
+          label,
           value: `${id}00000`,
           url,
           parentId: item.value
@@ -61,16 +64,18 @@ const sleep = (wait) => new Promise((resolve) => {
 
   // 遍历县级数据
   for (let i = 0; i < cityOriginalData.length; i++) {
-    await sleep(5000)
     const item = cityOriginalData[i]
+    await sleep(2000)
     await page.goto(item.url)
+    console.log(item.label)
     countyOriginalData = await page.evaluate(([countyOriginalData, item]) => {
       const countyLinks = document.querySelectorAll('.countytable .countytr td:last-of-type a')
       countyLinks.forEach((county) => {
         const url = county.href
         const { id } = url.match(/(?<id>\d+)\.html$/).groups
+        const label = county.innerText.replace('\n', '')
         countyOriginalData.push({
-          label: county.innerText.replace('\n', ''),
+          label,
           value: `${id}000`,
           url,
           parentId: item.value
@@ -82,16 +87,18 @@ const sleep = (wait) => new Promise((resolve) => {
 
   // 遍历镇级数据
   for (let i = 0; i < countyOriginalData.length; i++) {
-    await sleep(5000)
     const item = countyOriginalData[i]
+    await sleep(2000)
     await page.goto(item.url)
+    console.log(item.label)
     townOriginalData = await page.evaluate(([townOriginalData, item]) => {
       const countyLinks = document.querySelectorAll('.towntable .towntr td:last-of-type a')
       countyLinks.forEach((county) => {
         const url = county.href
         const { id } = url.match(/(?<id>\d+)\.html$/).groups
+        const label = county.innerText.replace('\n', '')
         townOriginalData.push({
-          label: county.innerText.replace('\n', ''),
+          label,
           value: id,
           url,
           parentId: item.value
