@@ -25,7 +25,6 @@ const sleep = (wait) => new Promise((resolve) => {
   provinceData = await page.evaluate((provinceData) => {
     const provinceLinks = document.querySelector('.provincetable').querySelectorAll('a')
     for (let i = 0; i < provinceLinks.length; i++) {
-      if (i > 3) break
       const province = provinceLinks[i]
       const url = province.href
       const { id } = url.match(/(?<id>\d+)\.html$/).groups
@@ -42,9 +41,8 @@ const sleep = (wait) => new Promise((resolve) => {
 
   // 遍历城市数据
   for (let i = 0; i < provinceData.length; i++) {
-    if (i > 3) break
     const item = provinceData[i]
-    // await sleep(2000)
+    await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     cityOriginalData = await page.evaluate(([cityOriginalData, item]) => {
@@ -66,9 +64,8 @@ const sleep = (wait) => new Promise((resolve) => {
 
   // 遍历县级数据
   for (let i = 0; i < cityOriginalData.length; i++) {
-    if (i > 3) break
     const item = cityOriginalData[i]
-    // await sleep(2000)
+    await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     countyOriginalData = await page.evaluate(([countyOriginalData, item]) => {
@@ -90,9 +87,8 @@ const sleep = (wait) => new Promise((resolve) => {
 
   // 遍历镇级数据
   for (let i = 0; i < countyOriginalData.length; i++) {
-    if (i > 3) break
     const item = countyOriginalData[i]
-    // await sleep(2000)
+    await sleep(2000)
     await page.goto(item.url)
     console.log(item.label)
     townOriginalData = await page.evaluate(([townOriginalData, item]) => {
