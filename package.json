@@ -1,0 +1,33 @@
+{
+  "name": "@xuanmo/region",
+  "version": "1.0.0",
+  "description": "",
+  "main": "region.json",
+  "scripts": {
+    "dev": "nodemon ./main.js",
+    "build": "node ./main.js"
+  },
+  "keywords": [],
+  "author": {
+    "name": "xuanmo",
+    "email": "me@xuanmo.xin"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/D-xuanmo/dl-ui"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@xuanmo/javascript-utils": "^0.0.47",
+    "puppeteer": "^20.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.1.0",
+    "nodemon": "^2.0.22"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "*.json"
+    ]
+  }
+}
