@@ -13,6 +13,8 @@ const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
   })
   const page = await browser.newPage()
 
+  page.setDefaultNavigationTimeout(120000)
+
   await page.goto(sourceURL)
 
   await page.setViewport({ width: 1440, height: 1024 })
