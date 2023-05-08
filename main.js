@@ -40,7 +40,7 @@ const { generateTree, isEmpty, deepCopy } = require('@xuanmo/javascript-utils')
   // 遍历城市数据
   for (let i = 0; i < provinceData.length; i++) {
     const item = provinceData[i]
-    await page.goto(item.url)
+    item.url && await page.goto(item.url)
     console.log(item.label)
     cityOriginalData = await page.evaluate(([cityOriginalData, item]) => {
       document.querySelectorAll('.citytable .citytr').forEach((tr) => {
@@ -80,7 +80,7 @@ const { generateTree, isEmpty, deepCopy } = require('@xuanmo/javascript-utils')
   // 遍历镇级数据
   for (let i = 0; i < countyOriginalData.length; i++) {
     const item = countyOriginalData[i]
-    await page.goto(item.url)
+    item.url && await page.goto(item.url)
     console.log(item.label)
     townOriginalData = await page.evaluate(([townOriginalData, item]) => {
       document.querySelectorAll('.towntable .towntr').forEach((tr) => {
