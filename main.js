@@ -40,7 +40,8 @@ const { generateTree, isEmpty, deepCopy } = require('@xuanmo/javascript-utils')
   // 遍历城市数据
   for (let i = 0; i < provinceData.length; i++) {
     const item = provinceData[i]
-    item.url && await page.goto(item.url)
+    if (!item.url) continue
+    await page.goto(item.url)
     console.log(item.label)
     cityOriginalData = await page.evaluate(([cityOriginalData, item]) => {
       document.querySelectorAll('.citytable .citytr').forEach((tr) => {
@@ -60,7 +61,8 @@ const { generateTree, isEmpty, deepCopy } = require('@xuanmo/javascript-utils')
   // 遍历县级数据
   for (let i = 0; i < cityOriginalData.length; i++) {
     const item = cityOriginalData[i]
-    item.url && await page.goto(item.url)
+    if (!item.url) continue
+    await page.goto(item.url)
     console.log(item.label)
     countyOriginalData = await page.evaluate(([countyOriginalData, item]) => {
       document.querySelectorAll('.countytable .countytr').forEach((tr) => {
@@ -80,7 +82,8 @@ const { generateTree, isEmpty, deepCopy } = require('@xuanmo/javascript-utils')
   // 遍历镇级数据
   for (let i = 0; i < countyOriginalData.length; i++) {
     const item = countyOriginalData[i]
-    item.url && await page.goto(item.url)
+    if (!item.url) continue
+    await page.goto(item.url)
     console.log(item.label)
     townOriginalData = await page.evaluate(([townOriginalData, item]) => {
       document.querySelectorAll('.towntable .towntr').forEach((tr) => {
@@ -105,6 +108,7 @@ const { generateTree, isEmpty, deepCopy } = require('@xuanmo/javascript-utils')
     ...countyOriginalData,
     ...townOriginalData
   ]
+
   // 省、市、县、镇
   const region = generateTree(deepCopy(flatData), '0', 'parentId', 'value')
 

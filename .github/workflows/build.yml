@@ -21,12 +21,16 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: yarn && yarn build
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Commit files
         run: |
           git clone https://github.com/D-xuanmo/china-region.git
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add region.json
+          git add .
           git commit -m "feat: 行政区域数据更新"
       - name: Push changes
         uses: ad-m/github-push-action@master
