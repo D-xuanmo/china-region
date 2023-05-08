@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
-const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
+const { generateTree, isEmpty, deepCopy } = require('@xuanmo/javascript-utils')
 
 ;(async () => {
   let provinceData = []
@@ -29,7 +29,7 @@ const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
       const label = province.innerText.replace('\n', '')
       provinceData.push({
         label,
-        value: id,
+        value: `${id}0000000000`,
         url,
         parentId: '0'
       })
@@ -43,16 +43,14 @@ const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
     await page.goto(item.url)
     console.log(item.label)
     cityOriginalData = await page.evaluate(([cityOriginalData, item]) => {
-      const cityLinks = document.querySelectorAll('.citytable .citytr td:last-of-type a')
-      cityLinks.forEach((city) => {
-        const url = city.href
-        const { id } = url.match(/(?<id>\d+)\.html$/).groups
-        const label = city.innerText.replace('\n', '')
+      document.querySelectorAll('.citytable .citytr').forEach((tr) => {
+        const [codeEl, labelEl] = tr.querySelectorAll('td')
+        const linkEl = labelEl.querySelector('a')
         cityOriginalData.push({
-          label,
-          value: id,
-          url,
-          parentId: item.value
+          label: labelEl?.innerText,
+          value: codeEl?.innerText,
+          parentId: item.value,
+          url: linkEl ? linkEl.href : null
         })
       })
       return cityOriginalData
@@ -62,19 +60,17 @@ const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
   // 遍历县级数据
   for (let i = 0; i < cityOriginalData.length; i++) {
     const item = cityOriginalData[i]
-    await page.goto(item.url)
+    item.url && await page.goto(item.url)
     console.log(item.label)
     countyOriginalData = await page.evaluate(([countyOriginalData, item]) => {
-      const countyLinks = document.querySelectorAll('.countytable .countytr td:last-of-type a')
-      countyLinks.forEach((county) => {
-        const url = county.href
-        const { id } = url.match(/(?<id>\d+)\.html$/).groups
-        const label = county.innerText.replace('\n', '')
+      document.querySelectorAll('.countytable .countytr').forEach((tr) => {
+        const [codeEl, labelEl] = tr.querySelectorAll('td')
+        const linkEl = labelEl.querySelector('a')
         countyOriginalData.push({
-          label,
-          value: id,
-          url,
-          parentId: item.value
+          label: labelEl?.innerText,
+          value: codeEl?.innerText,
+          parentId: item.value,
+          url: linkEl ? linkEl.href : null
         })
       })
       return countyOriginalData
@@ -87,16 +83,14 @@ const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
     await page.goto(item.url)
     console.log(item.label)
     townOriginalData = await page.evaluate(([townOriginalData, item]) => {
-      const countyLinks = document.querySelectorAll('.towntable .towntr td:last-of-type a')
-      countyLinks.forEach((county) => {
-        const url = county.href
-        const { id } = url.match(/(?<id>\d+)\.html$/).groups
-        const label = county.innerText.replace('\n', '')
+      document.querySelectorAll('.towntable .towntr').forEach((tr) => {
+        const [codeEl, labelEl] = tr.querySelectorAll('td')
+        const linkEl = labelEl.querySelector('a')
         townOriginalData.push({
-          label,
-          value: id,
-          url,
-          parentId: item.value
+          label: labelEl?.innerText,
+          value: codeEl?.innerText,
+          parentId: item.value,
+          url: linkEl ? linkEl.href : null
         })
       })
       return townOriginalData
@@ -111,7 +105,14 @@ const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
     ...countyOriginalData,
     ...townOriginalData
   ]
-  const region = generateTree(flatData, '0', 'parentId', 'value')
+  // 省、市、县、镇
+  const region = generateTree(deepCopy(flatData), '0', 'parentId', 'value')
+
+  // 省、市
+  const provinceCity = generateTree([...deepCopy(provinceData), ...deepCopy(cityOriginalData)], '0', 'parentId', 'value')
+
+  // 省、市、县
+  const provinceCityCounty = generateTree([...deepCopy(provinceData), ...deepCopy(cityOriginalData), ...deepCopy(countyOriginalData)], '0', 'parentId', 'value')
 
   // 清理多余的属性，减少数据体积
   const clear = (arr) => {
@@ -129,5 +130,17 @@ const { generateTree, isEmpty } = require('@xuanmo/javascript-utils')
   fs.writeFileSync(
     'region.json',
     JSON.stringify(clear(region), undefined, 2)
+  )
+  fs.writeFileSync(
+    'province.json',
+    JSON.stringify(clear(provinceData), undefined, 2)
+  )
+  fs.writeFileSync(
+    'province-city.json',
+    JSON.stringify(clear(provinceCity), undefined, 2)
+  )
+  fs.writeFileSync(
+    'province-city-county.json',
+    JSON.stringify(clear(provinceCityCounty), undefined, 2)
   )
 })()
