@@ -1,13 +1,14 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
-const { generateTree, isEmpty, deepCopy } = require('@xuanmo/javascript-utils')
+const { generateTree, isEmpty, deepCopy } = require('@xuanmo/utils')
 
 ;(async () => {
   let provinceData = []
   let cityOriginalData = []
   let countyOriginalData = []
   let townOriginalData = []
-  const sourceURL = 'http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/2022/index.html'
+  const date = new Date()
+  const sourceURL = `http://www.stats.gov.cn/sj/tjbz/tjyqhdmhcxhfdm/${date.getFullYear() - 1}/index.html`
   const browser = await puppeteer.launch({
     headless: 'new'
   })

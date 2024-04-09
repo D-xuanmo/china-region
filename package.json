@@ -18,7 +18,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@xuanmo/javascript-utils": "^0.0.47",
+    "@xuanmo/utils": "^0.0.2",
     "puppeteer": "^20.1.1"
   },
   "devDependencies": {

@@ -55,10 +55,10 @@
   dependencies:
     "@types/node" "*"
 
-"@xuanmo/javascript-utils@^0.0.47":
-  version "0.0.47"
-  resolved "https://registry.yarnpkg.com/@xuanmo/javascript-utils/-/javascript-utils-0.0.47.tgz#cf27f033483638c92d7af85aabaae5e0cfbbe6f9"
-  integrity sha512-9rPptBcGVCHuLbLVYYJr7wK1qMuBI1yDupfqY8gjwJucpjtOuJBBUCkeFUT5enG91lY0o0t2xFBItyxfSCm4OA==
+"@xuanmo/utils@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/@xuanmo/utils/-/utils-0.0.2.tgz#21413be4af2cd6403ab3c740b1034691262909b2"
+  integrity sha512-Tl5ikJikosyg/gTh5z2CGAl93WmuiDsNsabUy6NUzpOtMRXmlY1NMfvgvLZfmi0DtNzr51UShxkot/sIegQ3eg==
 
 abbrev@1:
   version "1.1.1"
